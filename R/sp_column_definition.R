@@ -686,6 +686,9 @@ get_column_default <- function(
 #' based on an existing data frame.
 #' @param data A data frame input. Column types are used to infer the
 #' appropriate Microsoft Lists column definition.
+#' @param definitions_as If `"definition_list"` (default) return named list
+#' output from `create_column_definition_list()`. If `"table"` return a
+#' dataframe with the column names and types.
 #' @param ... Ignored.
 #' @inheritParams create_column_definition_list
 #' @inheritParams create_choice_column
@@ -698,8 +701,12 @@ data_as_column_definition_list <- function(
   data,
   ...,
   split = "|",
-  ignore_na = TRUE
+  ignore_na = TRUE,
+  definitions_as = c("definition_list", "table")
 ) {
+  definitions_as <- arg_match(definitions_as)
+
+  # TODO: Pull display names from column labels
   col_types <- purrr::map_chr(
     data,
     \(x) {
@@ -717,9 +724,13 @@ data_as_column_definition_list <- function(
         # NA_character_
       )
 
-      if (all(is_url(x) | is.na(x))) {
+      na_x <- is.na(x)
+
+      if (!all(na_x) & all(is_url(x) | na_x)) {
         type <- "hyperlink"
       }
+
+      type
     }
   )
 
@@ -750,6 +761,10 @@ data_as_column_definition_list <- function(
   )
 
   definitions <- vctrs::vec_rbind(!!!definitions_list)
+
+  if (definitions_as == "table") {
+    return(definitions)
+  }
 
   create_column_definition_list(
     definitions,
