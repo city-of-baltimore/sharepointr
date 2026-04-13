@@ -4,7 +4,13 @@
 \alias{data_as_column_definition_list}
 \title{Convert a data frame to a column definition list}
 \usage{
-data_as_column_definition_list(data, ..., split = "|", ignore_na = TRUE)
+data_as_column_definition_list(
+  data,
+  ...,
+  split = "|",
+  ignore_na = TRUE,
+  definitions_as = c("definition_list", "table")
+)
 }
 \arguments{
 \item{data}{A data frame input. Column types are used to infer the
